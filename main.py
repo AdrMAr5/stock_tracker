@@ -87,9 +87,8 @@ def append_to_db(df):
 	df.to_sql('currencies_stock', engine, index=False, if_exists='append')
 
 
-
-def build_flow():
-	with Flow('stock_tracker_etl') as flow:
+def build_flow(schedule=None):
+	with Flow('stock_tracker_etl', schedule=schedule) as flow:
 		r = send_request()
 		data = parse_data(r)
 		append_to_db(data)
@@ -97,9 +96,9 @@ def build_flow():
 	return flow
 
 
+schedule = IntervalSchedule(interval=timedelta(hours=12))
 
-
-flow = build_flow()
+flow = build_flow(schedule)
 flow.run()
 
 
